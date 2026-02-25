@@ -36,3 +36,10 @@
 - Phase 4 chunk 3: added detection flow test using provider test doubles.
 - Phase 4 chunk 4: added refresh success and expired-credential state transition tests.
 - Advanced phase pointer to Phase 5.
+- Phase 5 chunk 1: added star field brightness-level test slice, then implemented `StarFieldViewModel`.
+- Phase 5 chunk 2: added empty/pad tests for star field data shaping.
+- Added `StarFieldView` SwiftUI rendering with tooltip and today indicator behavior.
+- Added UI foundations: `MoonRenderer`, `HeroMoonView`, `ProviderSwitcher`, `UsageSummaryView`, `FooterView`, `SettingsView`, and `PopoverView`.
+- UI files are guarded behind `canImport(SwiftUI)` / `canImport(AppKit)` to preserve non-macOS portability.
+- Attempted build verification; blocked by missing Swift toolchain in environment.
+- Advanced phase pointer to Phase 6.

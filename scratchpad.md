@@ -1,10 +1,10 @@
 # Scratchpad
 
 ## Active Work
-- Phase 5 in progress: UI foundation + popover.
+- Phase 6 in progress: AppDelegate wiring.
 
 ## Immediate Next Steps
-1. Add star field model tests in small slices.
-2. Implement `MoonRenderer` and core UI files with platform guards.
-3. Add popover shell + provider switcher + hero view.
-4. Add summary/footer/settings and wire into popover.
+1. Update `AppDelegate` to wire provider manager and providers.
+2. Hook popover root view and status icon updates from selected snapshot.
+3. Add right-click context menu (refresh/quit).
+4. Prepare scripts phase next.
