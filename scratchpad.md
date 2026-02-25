@@ -1,10 +1,10 @@
 # Scratchpad
 
 ## Active Work
-- Phase 0 complete; transitioning to Phase 1 (models + token formatter).
+- Phase 1 in progress: models + token formatter.
 
 ## Immediate Next Steps
-1. Add first small model test block (moon phase thresholds).
-2. Implement minimal model code to satisfy first block.
-3. Add next model test block (color thresholds + snapshots).
-4. Continue TDD loop for provider config and token formatter.
+1. Add next model test block for moon color thresholds.
+2. Extend `UsageData.swift` with color mapping + snapshot types.
+3. Add provider config test block and implementation.
+4. Add token formatter test chunk 1 and implementation.

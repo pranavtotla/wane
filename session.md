@@ -9,3 +9,6 @@
 - Added scaffold files: `Package.swift`, `Info.plist`, `WaneApp.swift`, and `AppDelegate.swift`.
 - Added conditional compilation guards for non-macOS environments.
 - Attempted package validation command; blocked by missing Swift toolchain.
+- Phase 1 chunk 1: added moon phase threshold test slice (`ModelsTests`).
+- Added initial `MoonPhase` implementation to satisfy threshold behavior.
+- Test execution remains blocked in this environment due missing Swift compiler.
