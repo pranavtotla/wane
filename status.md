@@ -5,7 +5,7 @@
 
 ## Phase Checklist
 - [x] Phase 0: create tracking docs
-- [ ] Phase 0: create package/app scaffold
+- [x] Phase 0: create package/app scaffold
 - [ ] Phase 1: models + token formatter
 - [ ] Phase 2: provider protocol + Claude provider
 - [ ] Phase 3: Codex + Cursor providers
