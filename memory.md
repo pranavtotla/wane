@@ -12,3 +12,4 @@
 
 ## Technical Decisions
 - Use conditional compilation for AppKit/SwiftUI-specific code to keep module portable in non-macOS environments.
+- Store provider tint as hex in core model (`tintHex`) and expose SwiftUI color only when SwiftUI is available.

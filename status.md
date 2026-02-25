@@ -1,12 +1,12 @@
 # Status
 
 ## Current Phase
-- Phase 0 — Bookkeeping + scaffold baseline
+- Phase 2 — Provider protocol + Claude provider
 
 ## Phase Checklist
 - [x] Phase 0: create tracking docs
 - [x] Phase 0: create package/app scaffold
-- [ ] Phase 1: models + token formatter
+- [x] Phase 1: models + token formatter
 - [ ] Phase 2: provider protocol + Claude provider
 - [ ] Phase 3: Codex + Cursor providers
 - [ ] Phase 4: ProviderManager
