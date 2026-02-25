@@ -18,3 +18,9 @@
 - Phase 1 chunk 5: added token formatter tests (small counts + exact format), then implementation.
 - Phase 1 chunk 6: added K/M/B rounding tests and rollover handling in formatter.
 - Advanced phase pointer to Phase 2 after completing planned model/formatter implementation slices.
+- Phase 2 chunk 1: added Claude credential parsing test.
+- Added provider abstractions (`Provider`, `ProviderError`, `ProviderStatus`) and initial Claude provider implementation.
+- Phase 2 chunk 2: added expired credential/scope behavior test.
+- Phase 2 chunk 3: added Claude usage payload parsing test.
+- Phase 2 chunk 4: added remaining-percentage calculation test.
+- Phase 2 implementation includes credential parsing, usage parsing, API request logic, and local JSONL scan helper.

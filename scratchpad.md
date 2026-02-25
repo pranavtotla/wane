@@ -1,10 +1,10 @@
 # Scratchpad
 
 ## Active Work
-- Phase 2 in progress: provider protocol + Claude provider.
+- Phase 3 in progress: Codex + Cursor providers.
 
 ## Immediate Next Steps
-1. Add first Claude provider test slice for credential parsing.
-2. Implement provider protocol primitives (`Provider`, `ProviderError`, `ProviderStatus`).
-3. Implement Claude credential/usage parsing structures.
-4. Continue with remaining Claude test slices and provider shell.
+1. Add Codex auth parsing test slice and implement minimal auth parser.
+2. Add Codex usage parsing/remaining tests and implement usage model/provider shell.
+3. Add Cursor usage summary tests (standard + unlimited).
+4. Implement Cursor provider and SQLite token reader.
