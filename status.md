@@ -1,7 +1,7 @@
 # Status
 
 ## Current Phase
-- Phase 6 — AppDelegate wiring
+- Phase 7 — packaging + final verification
 
 ## Phase Checklist
 - [x] Phase 0: create tracking docs
@@ -11,7 +11,7 @@
 - [x] Phase 3: Codex + Cursor providers
 - [x] Phase 4: ProviderManager
 - [x] Phase 5: UI foundation + popover
-- [ ] Phase 6: AppDelegate wiring
+- [x] Phase 6: AppDelegate wiring
 - [ ] Phase 7: packaging + final verification
 
 ## Blockers

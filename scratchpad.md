@@ -1,10 +1,10 @@
 # Scratchpad
 
 ## Active Work
-- Phase 6 in progress: AppDelegate wiring.
+- Phase 7 in progress: packaging + final verification.
 
 ## Immediate Next Steps
-1. Update `AppDelegate` to wire provider manager and providers.
-2. Hook popover root view and status icon updates from selected snapshot.
-3. Add right-click context menu (refresh/quit).
-4. Prepare scripts phase next.
+1. Add `Scripts/build.sh`.
+2. Add `Scripts/package_app.sh`.
+3. Make scripts executable.
+4. Attempt final test/build commands (environment permitting).

@@ -43,3 +43,8 @@
 - UI files are guarded behind `canImport(SwiftUI)` / `canImport(AppKit)` to preserve non-macOS portability.
 - Attempted build verification; blocked by missing Swift toolchain in environment.
 - Advanced phase pointer to Phase 6.
+- Phase 6: rewired `AppDelegate` to register providers, host `PopoverView`, and bind status icon updates to manager state.
+- Added right-click context menu actions for refresh and quit.
+- Added polling startup and initial detect/refresh flow.
+- Attempted post-integration build; still blocked by missing Swift toolchain.
+- Advanced phase pointer to Phase 7.
