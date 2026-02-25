@@ -30,3 +30,9 @@
 - Phase 3 chunk 3: added Cursor usage-summary parsing test and implemented `CursorUsageSummary`.
 - Phase 3 chunk 4: added Cursor unlimited-plan test and completed `CursorProvider` with SQLite token read and API fallback mode.
 - Advanced phase pointer to Phase 4.
+- Phase 4 chunk 1: added `ProviderManager` initial-state and selection tests.
+- Added `ProviderManager` implementation with registration, selection, detection, refresh, and polling API.
+- Phase 4 chunk 2: added snapshot lookup and unknown-status tests.
+- Phase 4 chunk 3: added detection flow test using provider test doubles.
+- Phase 4 chunk 4: added refresh success and expired-credential state transition tests.
+- Advanced phase pointer to Phase 5.

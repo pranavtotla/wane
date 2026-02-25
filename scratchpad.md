@@ -1,10 +1,10 @@
 # Scratchpad
 
 ## Active Work
-- Phase 4 in progress: ProviderManager.
+- Phase 5 in progress: UI foundation + popover.
 
 ## Immediate Next Steps
-1. Add ProviderManager initial state and selection tests.
-2. Implement minimal manager to satisfy state tests.
-3. Add status/snapshot lookup tests + implementations.
-4. Add registration/detection/refresh behavior tests with test doubles.
+1. Add star field model tests in small slices.
+2. Implement `MoonRenderer` and core UI files with platform guards.
+3. Add popover shell + provider switcher + hero view.
+4. Add summary/footer/settings and wire into popover.
