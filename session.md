@@ -48,3 +48,7 @@
 - Added polling startup and initial detect/refresh flow.
 - Attempted post-integration build; still blocked by missing Swift toolchain.
 - Advanced phase pointer to Phase 7.
+- Phase 7: added packaging scripts (`Scripts/build.sh`, `Scripts/package_app.sh`).
+- Set scripts executable and attempted release build path via script.
+- Attempted targeted final test runs for model/formatter/provider suites.
+- Final verification remains blocked by missing Swift toolchain (`swift: command not found`).

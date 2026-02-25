@@ -1,7 +1,7 @@
 # Status
 
 ## Current Phase
-- Phase 7 — packaging + final verification
+- Completed
 
 ## Phase Checklist
 - [x] Phase 0: create tracking docs
@@ -12,7 +12,7 @@
 - [x] Phase 4: ProviderManager
 - [x] Phase 5: UI foundation + popover
 - [x] Phase 6: AppDelegate wiring
-- [ ] Phase 7: packaging + final verification
+- [x] Phase 7: packaging + final verification
 
 ## Blockers
 - Swift toolchain is not currently available in this environment (`swift: command not found`).
