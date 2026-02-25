@@ -24,3 +24,9 @@
 - Phase 2 chunk 3: added Claude usage payload parsing test.
 - Phase 2 chunk 4: added remaining-percentage calculation test.
 - Phase 2 implementation includes credential parsing, usage parsing, API request logic, and local JSONL scan helper.
+- Phase 3 chunk 1: added Codex auth parsing test and implemented `CodexAuth`.
+- Phase 3 chunk 2: added Codex usage parsing/remaining test and implemented `CodexUsageResponse`.
+- Added `CodexProvider` with detection, API fetch path, and local session scan helper.
+- Phase 3 chunk 3: added Cursor usage-summary parsing test and implemented `CursorUsageSummary`.
+- Phase 3 chunk 4: added Cursor unlimited-plan test and completed `CursorProvider` with SQLite token read and API fallback mode.
+- Advanced phase pointer to Phase 4.

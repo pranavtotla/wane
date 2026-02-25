@@ -1,10 +1,10 @@
 # Scratchpad
 
 ## Active Work
-- Phase 3 in progress: Codex + Cursor providers.
+- Phase 4 in progress: ProviderManager.
 
 ## Immediate Next Steps
-1. Add Codex auth parsing test slice and implement minimal auth parser.
-2. Add Codex usage parsing/remaining tests and implement usage model/provider shell.
-3. Add Cursor usage summary tests (standard + unlimited).
-4. Implement Cursor provider and SQLite token reader.
+1. Add ProviderManager initial state and selection tests.
+2. Implement minimal manager to satisfy state tests.
+3. Add status/snapshot lookup tests + implementations.
+4. Add registration/detection/refresh behavior tests with test doubles.
