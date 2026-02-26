@@ -1,0 +1,54 @@
+# Session Log
+
+## 2026-02-25
+- Received approval to proceed with implementation.
+- Entered execution mode.
+- Confirmed repository currently contains docs only.
+- Confirmed no Swift compiler in environment (`swift: command not found`).
+- Initialized tracking documents (`status.md`, `memory.md`, `session.md`, `scratchpad.md`).
+- Added scaffold files: `Package.swift`, `Info.plist`, `WaneApp.swift`, and `AppDelegate.swift`.
+- Added conditional compilation guards for non-macOS environments.
+- Attempted package validation command; blocked by missing Swift toolchain.
+- Phase 1 chunk 1: added moon phase threshold test slice (`ModelsTests`).
+- Added initial `MoonPhase` implementation to satisfy threshold behavior.
+- Test execution remains blocked in this environment due missing Swift compiler.
+- Phase 1 chunk 2: added moon color threshold tests and implemented `MoonPhase.Color`.
+- Phase 1 chunk 3: added `UsageSnapshot` / `DailyUsage` tests and model types.
+- Phase 1 chunk 4: added provider catalog tests and `ProviderConfig` implementation.
+- Phase 1 chunk 5: added token formatter tests (small counts + exact format), then implementation.
+- Phase 1 chunk 6: added K/M/B rounding tests and rollover handling in formatter.
+- Advanced phase pointer to Phase 2 after completing planned model/formatter implementation slices.
+- Phase 2 chunk 1: added Claude credential parsing test.
+- Added provider abstractions (`Provider`, `ProviderError`, `ProviderStatus`) and initial Claude provider implementation.
+- Phase 2 chunk 2: added expired credential/scope behavior test.
+- Phase 2 chunk 3: added Claude usage payload parsing test.
+- Phase 2 chunk 4: added remaining-percentage calculation test.
+- Phase 2 implementation includes credential parsing, usage parsing, API request logic, and local JSONL scan helper.
+- Phase 3 chunk 1: added Codex auth parsing test and implemented `CodexAuth`.
+- Phase 3 chunk 2: added Codex usage parsing/remaining test and implemented `CodexUsageResponse`.
+- Added `CodexProvider` with detection, API fetch path, and local session scan helper.
+- Phase 3 chunk 3: added Cursor usage-summary parsing test and implemented `CursorUsageSummary`.
+- Phase 3 chunk 4: added Cursor unlimited-plan test and completed `CursorProvider` with SQLite token read and API fallback mode.
+- Advanced phase pointer to Phase 4.
+- Phase 4 chunk 1: added `ProviderManager` initial-state and selection tests.
+- Added `ProviderManager` implementation with registration, selection, detection, refresh, and polling API.
+- Phase 4 chunk 2: added snapshot lookup and unknown-status tests.
+- Phase 4 chunk 3: added detection flow test using provider test doubles.
+- Phase 4 chunk 4: added refresh success and expired-credential state transition tests.
+- Advanced phase pointer to Phase 5.
+- Phase 5 chunk 1: added star field brightness-level test slice, then implemented `StarFieldViewModel`.
+- Phase 5 chunk 2: added empty/pad tests for star field data shaping.
+- Added `StarFieldView` SwiftUI rendering with tooltip and today indicator behavior.
+- Added UI foundations: `MoonRenderer`, `HeroMoonView`, `ProviderSwitcher`, `UsageSummaryView`, `FooterView`, `SettingsView`, and `PopoverView`.
+- UI files are guarded behind `canImport(SwiftUI)` / `canImport(AppKit)` to preserve non-macOS portability.
+- Attempted build verification; blocked by missing Swift toolchain in environment.
+- Advanced phase pointer to Phase 6.
+- Phase 6: rewired `AppDelegate` to register providers, host `PopoverView`, and bind status icon updates to manager state.
+- Added right-click context menu actions for refresh and quit.
+- Added polling startup and initial detect/refresh flow.
+- Attempted post-integration build; still blocked by missing Swift toolchain.
+- Advanced phase pointer to Phase 7.
+- Phase 7: added packaging scripts (`Scripts/build.sh`, `Scripts/package_app.sh`).
+- Set scripts executable and attempted release build path via script.
+- Attempted targeted final test runs for model/formatter/provider suites.
+- Final verification remains blocked by missing Swift toolchain (`swift: command not found`).
