@@ -95,10 +95,14 @@ final class CodexProvider: Provider {
         }
 
         let usage = try CodexUsageResponse.parse(from: responseData)
+        let planType = (try? JSONSerialization.jsonObject(with: responseData) as? [String: Any])?["plan_type"] as? String
         return UsageSnapshot(
             remainingPercentage: usage.remainingPercentage,
             resetsAt: usage.primaryResetsAt,
-            dailyUsage: scanLocalSessions()
+            dailyUsage: scanLocalSessions(),
+            planName: planType?.capitalized,
+            extraUsageSpent: nil,
+            extraUsageLimit: nil
         )
     }
 
@@ -118,7 +122,10 @@ final class CodexProvider: Provider {
         var dailyCounts: [String: Int] = [:]
         let keyFormatter = DateFormatter()
         keyFormatter.dateFormat = "yyyy-MM-dd"
-        let timestampFormatter = ISO8601DateFormatter()
+        let fractionalFormatter = ISO8601DateFormatter()
+        fractionalFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let fallbackFormatter = ISO8601DateFormatter()
+        fallbackFormatter.formatOptions = [.withInternetDateTime]
 
         while let fileURL = enumerator.nextObject() as? URL {
             guard fileURL.pathExtension == "jsonl" else { continue }
@@ -131,6 +138,10 @@ final class CodexProvider: Provider {
                 continue
             }
 
+            // Find the last token_count event with total_token_usage per session file
+            var sessionTotal = 0
+            var sessionDate: String?
+
             for line in content.split(separator: "\n") {
                 guard
                     let lineData = line.data(using: .utf8),
@@ -139,24 +150,23 @@ final class CodexProvider: Provider {
                     let payload = obj["payload"] as? [String: Any],
                     payload["type"] as? String == "token_count",
                     let info = payload["info"] as? [String: Any],
-                    let usage = info["last_token_usage"] as? [String: Any]
+                    let totalUsage = info["total_token_usage"] as? [String: Any],
+                    let totalTokens = totalUsage["total_tokens"] as? Int
                 else {
                     continue
                 }
 
-                let input = usage["input_tokens"] as? Int ?? 0
-                let output = usage["output_tokens"] as? Int ?? 0
-                let total = input + output
+                sessionTotal = totalTokens
 
-                guard
-                    let timestamp = obj["timestamp"] as? String,
-                    let date = timestampFormatter.date(from: timestamp)
-                else {
-                    continue
+                if sessionDate == nil,
+                   let timestamp = obj["timestamp"] as? String,
+                   let date = fractionalFormatter.date(from: timestamp) ?? fallbackFormatter.date(from: timestamp) {
+                    sessionDate = keyFormatter.string(from: date)
                 }
+            }
 
-                let key = keyFormatter.string(from: date)
-                dailyCounts[key, default: 0] += total
+            if let key = sessionDate, sessionTotal > 0 {
+                dailyCounts[key, default: 0] += sessionTotal
             }
         }
 

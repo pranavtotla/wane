@@ -144,7 +144,10 @@ final class ClaudeProvider: Provider {
         return UsageSnapshot(
             remainingPercentage: usage.remainingPercentage,
             resetsAt: usage.fiveHour?.resetsAt,
-            dailyUsage: scanLocalUsage()
+            dailyUsage: scanLocalUsage(),
+            planName: credentials.subscriptionType?.capitalized,
+            extraUsageSpent: usage.extraUsage?.usedCredits,
+            extraUsageLimit: usage.extraUsage?.monthlyLimit.map(Double.init)
         )
     }
 
@@ -164,7 +167,10 @@ final class ClaudeProvider: Provider {
         var dailyCounts: [String: Int] = [:]
         let keyFormatter = DateFormatter()
         keyFormatter.dateFormat = "yyyy-MM-dd"
-        let timestampFormatter = ISO8601DateFormatter()
+        let fractionalFormatter = ISO8601DateFormatter()
+        fractionalFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let fallbackFormatter = ISO8601DateFormatter()
+        fallbackFormatter.formatOptions = [.withInternetDateTime]
 
         while let fileURL = enumerator.nextObject() as? URL {
             guard fileURL.pathExtension == "jsonl" else { continue }
@@ -176,6 +182,11 @@ final class ClaudeProvider: Provider {
             guard let content = try? String(contentsOf: fileURL, encoding: .utf8) else {
                 continue
             }
+
+            // Deduplicate: Claude emits multiple lines per message with cumulative usage.
+            // Keep only the last (highest) entry per message.id + requestId pair.
+            var seenKeys = Set<String>()
+            var entries: [(dayKey: String, dedupeKey: String?, tokens: Int)] = []
 
             for line in content.split(separator: "\n") {
                 guard
@@ -190,17 +201,32 @@ final class ClaudeProvider: Provider {
 
                 let inputTokens = usage["input_tokens"] as? Int ?? 0
                 let outputTokens = usage["output_tokens"] as? Int ?? 0
-                let totalTokens = inputTokens + outputTokens
+                let cacheCreation = usage["cache_creation_input_tokens"] as? Int ?? 0
+                let cacheRead = usage["cache_read_input_tokens"] as? Int ?? 0
+                let totalTokens = inputTokens + outputTokens + cacheCreation + cacheRead
 
                 guard
                     let timestamp = obj["timestamp"] as? String,
-                    let date = timestampFormatter.date(from: timestamp)
+                    let date = fractionalFormatter.date(from: timestamp) ?? fallbackFormatter.date(from: timestamp)
                 else {
                     continue
                 }
 
-                let key = keyFormatter.string(from: date)
-                dailyCounts[key, default: 0] += totalTokens
+                let dayKey = keyFormatter.string(from: date)
+                let messageId = message["id"] as? String
+                let requestId = obj["requestId"] as? String
+                let dedupeKey: String? = (messageId != nil && requestId != nil) ? "\(messageId!):\(requestId!)" : nil
+
+                entries.append((dayKey: dayKey, dedupeKey: dedupeKey, tokens: totalTokens))
+            }
+
+            // Process in reverse so the first seen (= last emitted) wins
+            for entry in entries.reversed() {
+                if let key = entry.dedupeKey {
+                    guard !seenKeys.contains(key) else { continue }
+                    seenKeys.insert(key)
+                }
+                dailyCounts[entry.dayKey, default: 0] += entry.tokens
             }
         }
 
