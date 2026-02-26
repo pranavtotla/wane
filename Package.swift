@@ -11,9 +11,7 @@ let package = Package(
         .executableTarget(
             name: "Wane",
             path: "Sources/Wane",
-            resources: [
-                .copy("Resources/Info.plist")
-            ]
+            exclude: ["Resources/Info.plist"]
         ),
         .testTarget(
             name: "WaneTests",

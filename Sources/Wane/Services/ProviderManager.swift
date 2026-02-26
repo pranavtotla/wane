@@ -52,7 +52,7 @@ final class ProviderManager: ObservableObject {
     }
 
     func refreshAll() async {
-        for (id, provider) in providers where statuses[id] == .ok || statuses[id] == .stale {
+        for (id, provider) in providers where statuses[id] != .notInstalled {
             do {
                 let snapshot = try await provider.fetchUsage()
                 snapshots[id] = snapshot
@@ -143,7 +143,7 @@ final class ProviderManager {
     }
 
     func refreshAll() async {
-        for (id, provider) in providers where statuses[id] == .ok || statuses[id] == .stale {
+        for (id, provider) in providers where statuses[id] != .notInstalled {
             do {
                 let snapshot = try await provider.fetchUsage()
                 snapshots[id] = snapshot
