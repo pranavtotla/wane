@@ -1,5 +1,6 @@
-#if canImport(SwiftUI)
+#if canImport(SwiftUI) && canImport(AppKit)
 import SwiftUI
+import AppKit
 
 struct PopoverView: View {
     @ObservedObject var manager: ProviderManager
@@ -17,40 +18,56 @@ struct PopoverView: View {
 
     private var mainView: some View {
         VStack(spacing: 0) {
-            if let snapshot = manager.selectedSnapshot,
-               let config = manager.selectedConfig {
-                HeroMoonView(snapshot: snapshot, config: config)
-            } else {
-                VStack(spacing: 8) {
-                    Image(systemName: "moon.zzz")
-                        .font(.largeTitle)
-                        .foregroundColor(.secondary)
-                    Text("No providers detected")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+            ProviderTabBar(manager: manager)
+
+            separator
+
+            // Provider detail with content transition keyed on selected provider
+            Group {
+                if let snapshot = manager.selectedSnapshot,
+                   let config = manager.selectedConfig {
+                    ProviderDetailView(
+                        snapshot: snapshot,
+                        config: config,
+                        lastRefresh: manager.lastRefresh
+                    )
+                    .id(config.id)
+                    .transition(.opacity)
+                } else {
+                    VStack(spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle")
+                            .font(.title2)
+                            .foregroundColor(.secondary)
+                        Text("No providers detected")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Text("Install Claude, Codex, or Cursor to get started")
+                            .font(.caption2)
+                            .foregroundColor(.secondary.opacity(0.7))
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 32)
                 }
-                .padding(.vertical, 24)
             }
+            .animation(.easeOut(duration: 0.15), value: manager.selectedProviderId)
 
-            Divider().opacity(0.3)
-            ProviderSwitcher(manager: manager)
-            Divider().opacity(0.3)
+            separator
 
-            if let snapshot = manager.selectedSnapshot {
-                StarFieldView(
-                    dailyUsage: snapshot.dailyUsage,
-                    tintColor: manager.selectedConfig?.tintColor ?? .white
-                )
-                UsageSummaryView(dailyUsage: snapshot.dailyUsage)
-            }
+            QuickLinksView(selectedConfig: manager.selectedConfig)
 
-            Spacer()
-            Divider().opacity(0.3)
+            separator
+
             FooterView(manager: manager, showSettings: $showSettings)
         }
-        .frame(width: 280, height: 400)
-        .background(.ultraThinMaterial.opacity(0.9))
+        .frame(width: 320)
+        .background(Color(nsColor: .windowBackgroundColor))
         .environment(\.colorScheme, .dark)
+    }
+
+    private var separator: some View {
+        Rectangle()
+            .fill(Color.white.opacity(0.08))
+            .frame(height: 1)
     }
 }
 #endif

@@ -1,41 +1,57 @@
-#if canImport(SwiftUI)
+#if canImport(SwiftUI) && canImport(AppKit)
 import SwiftUI
+import AppKit
 
 struct FooterView: View {
     @ObservedObject var manager: ProviderManager
     @Binding var showSettings: Bool
 
     var body: some View {
-        HStack {
-            Button(action: {
-                Task { await manager.refreshAll() }
-            }) {
-                HStack(spacing: 4) {
-                    Image(systemName: "arrow.clockwise")
-                        .font(.caption2)
-                    if let lastRefresh = manager.lastRefresh {
-                        Text("~\(lastRefresh.timeAgoShort)")
-                            .font(.system(.caption2, design: .monospaced))
-                    } else {
-                        Text("refresh")
-                            .font(.caption2)
-                    }
-                }
-                .foregroundColor(.secondary)
+        VStack(spacing: 0) {
+            FooterRow(icon: "gearshape", label: "Settings...") {
+                showSettings = true
             }
-            .buttonStyle(.plain)
+            FooterRow(icon: "info.circle", label: "About Wane") {
+                // TODO: about panel
+            }
+            FooterRow(icon: "xmark.circle", label: "Quit") {
+                NSApp.terminate(nil)
+            }
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+struct FooterRow: View {
+    let icon: String
+    let label: String
+    let action: () -> Void
+
+    @State private var isHovering = false
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 12))
+                .foregroundColor(.secondary)
+                .frame(width: 16)
+
+            Text(label)
+                .font(.system(size: 13))
+                .foregroundColor(.white.opacity(0.9))
 
             Spacer()
-
-            Button(action: { showSettings = true }) {
-                Image(systemName: "gearshape")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            .buttonStyle(.plain)
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 8)
+        .padding(.vertical, 6)
+        .contentShape(Rectangle())
+        .background(isHovering ? Color.white.opacity(0.06) : Color.clear)
+        .onHover { hovering in
+            isHovering = hovering
+        }
+        .onTapGesture {
+            action()
+        }
     }
 }
 
