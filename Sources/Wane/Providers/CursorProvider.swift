@@ -2,9 +2,6 @@ import Foundation
 #if canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
-#if canImport(SQLite3)
-import SQLite3
-#endif
 
 struct CursorUsageSummary: Equatable {
     let planUsedPercent: Double
@@ -24,7 +21,11 @@ struct CursorUsageSummary: Equatable {
         let isUnlimited = root["isUnlimited"] as? Bool ?? false
         let individualUsage = root["individualUsage"] as? [String: Any]
         let plan = individualUsage?["plan"] as? [String: Any]
-        let planUsedPercent = Self.number(from: plan?["totalPercentUsed"]) ?? 0
+
+        // Use used/limit for accurate plan percentage (totalPercentUsed includes bonus credits)
+        let used = Self.number(from: plan?["used"]) ?? 0
+        let limit = Self.number(from: plan?["limit"]) ?? 0
+        let planUsedPercent = limit > 0 ? min(100, (used / limit) * 100) : 0
 
         let cycleEnd: Date? = {
             guard let raw = root["billingCycleEnd"] as? String else { return nil }
@@ -62,65 +63,37 @@ final class CursorProvider: Provider {
     }
 
     func fetchUsage() async throws -> UsageSnapshot {
-        let accessToken = try readAccessToken()
-
-        var request = URLRequest(url: URL(string: "https://cursor.com/api/usage-summary")!)
-        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-
-        let (data, response) = try await URLSession.shared.data(for: request)
-        if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
-            let summary = try CursorUsageSummary.parse(from: data)
-            return UsageSnapshot(
-                remainingPercentage: summary.remainingPercentage,
-                resetsAt: summary.billingCycleEnd,
-                dailyUsage: []
-            )
+        guard let cookieHeader = CursorSession.load() else {
+            throw ProviderError.credentialsExpired
         }
 
-        return try await fetchUsageWithCookie(accessToken: accessToken)
-    }
-
-    private func fetchUsageWithCookie(accessToken: String) async throws -> UsageSnapshot {
         var request = URLRequest(url: URL(string: "https://cursor.com/api/usage-summary")!)
-        request.setValue("WorkosCursorSessionToken=\(accessToken)", forHTTPHeaderField: "Cookie")
+        request.setValue(cookieHeader, forHTTPHeaderField: "Cookie")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
 
         let (data, response) = try await URLSession.shared.data(for: request)
-        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-            throw ProviderError.fetchFailed("Cursor API returned non-200")
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw ProviderError.fetchFailed("Cursor: no HTTP response")
+        }
+
+        if httpResponse.statusCode == 401 || httpResponse.statusCode == 403 {
+            CursorSession.clear()
+            throw ProviderError.credentialsExpired
+        }
+
+        guard httpResponse.statusCode == 200 else {
+            throw ProviderError.fetchFailed("Cursor API returned \(httpResponse.statusCode)")
         }
 
         let summary = try CursorUsageSummary.parse(from: data)
+        let membershipType = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])?["membershipType"] as? String
         return UsageSnapshot(
             remainingPercentage: summary.remainingPercentage,
             resetsAt: summary.billingCycleEnd,
-            dailyUsage: []
+            dailyUsage: [],
+            planName: membershipType?.capitalized,
+            extraUsageSpent: nil,
+            extraUsageLimit: nil
         )
-    }
-
-    func readAccessToken() throws -> String {
-        #if canImport(SQLite3)
-        var database: OpaquePointer?
-        guard sqlite3_open_v2(Self.stateDbPath, &database, SQLITE_OPEN_READONLY, nil) == SQLITE_OK else {
-            throw ProviderError.credentialsNotFound
-        }
-        defer { sqlite3_close(database) }
-
-        var statement: OpaquePointer?
-        let query = "SELECT value FROM ItemTable WHERE key = 'cursorAuth/accessToken'"
-        guard sqlite3_prepare_v2(database, query, -1, &statement, nil) == SQLITE_OK else {
-            throw ProviderError.credentialsNotFound
-        }
-        defer { sqlite3_finalize(statement) }
-
-        guard sqlite3_step(statement) == SQLITE_ROW, let value = sqlite3_column_text(statement, 0) else {
-            throw ProviderError.credentialsNotFound
-        }
-
-        return String(cString: value)
-        #else
-        throw ProviderError.credentialsNotFound
-        #endif
     }
 }
