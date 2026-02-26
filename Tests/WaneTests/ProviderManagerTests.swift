@@ -1,6 +1,7 @@
 import XCTest
 @testable import Wane
 
+@MainActor
 final class ProviderManagerTests: XCTestCase {
     final class MockProvider: Provider {
         let config: ProviderConfig
@@ -43,7 +44,10 @@ final class ProviderManagerTests: XCTestCase {
         let snapshot = UsageSnapshot(
             remainingPercentage: 67.0,
             resetsAt: Date(),
-            dailyUsage: []
+            dailyUsage: [],
+            planName: nil,
+            extraUsageSpent: nil,
+            extraUsageLimit: nil
         )
         manager.snapshots["claude"] = snapshot
         XCTAssertEqual(manager.snapshot(for: "claude")?.remainingPercentage, 67.0)
@@ -70,7 +74,7 @@ final class ProviderManagerTests: XCTestCase {
         let manager = ProviderManager()
         manager.registerProvider(
             MockProvider(config: .claude, detected: true) {
-                UsageSnapshot(remainingPercentage: 67, resetsAt: Date(), dailyUsage: [])
+                UsageSnapshot(remainingPercentage: 67, resetsAt: Date(), dailyUsage: [], planName: nil, extraUsageSpent: nil, extraUsageLimit: nil)
             }
         )
 

@@ -1,48 +1,5 @@
 import Foundation
 
-enum MoonPhase: Equatable {
-    case full      // >85%
-    case gibbous   // 60-85%
-    case quarter   // 35-60%
-    case crescent  // 10-35%
-    case new       // <10%
-
-    static func from(percentage: Double) -> MoonPhase {
-        switch percentage {
-        case 85.1...:
-            return .full
-        case 60...85:
-            return .gibbous
-        case 35..<60:
-            return .quarter
-        case 10..<35:
-            return .crescent
-        default:
-            return .new
-        }
-    }
-
-    enum Color: Equatable {
-        case white
-        case amber
-        case orange
-        case red
-    }
-
-    static func color(forPercentage percentage: Double) -> Color {
-        switch percentage {
-        case 60.1...:
-            return .white
-        case 35...60:
-            return .amber
-        case 10..<35:
-            return .orange
-        default:
-            return .red
-        }
-    }
-}
-
 struct DailyUsage: Equatable {
     let date: Date
     let tokenCount: Int
@@ -52,18 +9,36 @@ struct UsageSnapshot: Equatable {
     let remainingPercentage: Double
     let resetsAt: Date?
     let dailyUsage: [DailyUsage]
-
-    var moonPhase: MoonPhase {
-        MoonPhase.from(percentage: remainingPercentage)
-    }
-
-    var moonColor: MoonPhase.Color {
-        MoonPhase.color(forPercentage: remainingPercentage)
-    }
+    let planName: String?
+    let extraUsageSpent: Double?
+    let extraUsageLimit: Double?
 
     static let empty = UsageSnapshot(
         remainingPercentage: 100,
         resetsAt: nil,
-        dailyUsage: []
+        dailyUsage: [],
+        planName: nil,
+        extraUsageSpent: nil,
+        extraUsageLimit: nil
     )
+
+    var todayTokens: Int {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        return dailyUsage
+            .filter { calendar.isDate($0.date, inSameDayAs: today) }
+            .reduce(0) { $0 + $1.tokenCount }
+    }
+
+    var last7DaysTokens: Int {
+        let calendar = Calendar.current
+        let sevenDaysAgo = calendar.date(byAdding: .day, value: -6, to: calendar.startOfDay(for: Date()))!
+        return dailyUsage
+            .filter { $0.date >= sevenDaysAgo }
+            .reduce(0) { $0 + $1.tokenCount }
+    }
+
+    var last30DaysTokens: Int {
+        dailyUsage.reduce(0) { $0 + $1.tokenCount }
+    }
 }
