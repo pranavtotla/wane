@@ -1,0 +1,4 @@
+.build/
+build/
+Wane.app/
+.DS_Store
