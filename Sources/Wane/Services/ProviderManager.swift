@@ -52,16 +52,31 @@ final class ProviderManager: ObservableObject {
     }
 
     func refreshAll() async {
-        for (id, provider) in providers where statuses[id] != .notInstalled {
-            do {
-                let snapshot = try await provider.fetchUsage()
-                snapshots[id] = snapshot
-                statuses[id] = .ok
-            } catch ProviderError.credentialsExpired {
-                statuses[id] = .needsReauth
-            } catch {
-                if snapshots[id] != nil {
-                    statuses[id] = .stale
+        let targets = providers.filter { statuses[$0.key] != .notInstalled }
+
+        await withTaskGroup(of: (String, Result<UsageSnapshot, Error>).self) { group in
+            for (id, provider) in targets {
+                group.addTask { [id] in
+                    do {
+                        let snapshot = try await provider.fetchUsage()
+                        return (id, .success(snapshot))
+                    } catch {
+                        return (id, .failure(error))
+                    }
+                }
+            }
+
+            for await (id, result) in group {
+                switch result {
+                case .success(let snapshot):
+                    snapshots[id] = snapshot
+                    statuses[id] = .ok
+                case .failure(ProviderError.credentialsExpired):
+                    statuses[id] = .needsReauth
+                case .failure:
+                    if snapshots[id] != nil {
+                        statuses[id] = .stale
+                    }
                 }
             }
         }
@@ -143,16 +158,31 @@ final class ProviderManager {
     }
 
     func refreshAll() async {
-        for (id, provider) in providers where statuses[id] != .notInstalled {
-            do {
-                let snapshot = try await provider.fetchUsage()
-                snapshots[id] = snapshot
-                statuses[id] = .ok
-            } catch ProviderError.credentialsExpired {
-                statuses[id] = .needsReauth
-            } catch {
-                if snapshots[id] != nil {
-                    statuses[id] = .stale
+        let targets = providers.filter { statuses[$0.key] != .notInstalled }
+
+        await withTaskGroup(of: (String, Result<UsageSnapshot, Error>).self) { group in
+            for (id, provider) in targets {
+                group.addTask { [id] in
+                    do {
+                        let snapshot = try await provider.fetchUsage()
+                        return (id, .success(snapshot))
+                    } catch {
+                        return (id, .failure(error))
+                    }
+                }
+            }
+
+            for await (id, result) in group {
+                switch result {
+                case .success(let snapshot):
+                    snapshots[id] = snapshot
+                    statuses[id] = .ok
+                case .failure(ProviderError.credentialsExpired):
+                    statuses[id] = .needsReauth
+                case .failure:
+                    if snapshots[id] != nil {
+                        statuses[id] = .stale
+                    }
                 }
             }
         }

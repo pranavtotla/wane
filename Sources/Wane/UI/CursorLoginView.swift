@@ -22,9 +22,7 @@ struct CursorLoginView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
 
-            Rectangle()
-                .fill(Color.white.opacity(0.08))
-                .frame(height: 1)
+            Separator()
 
             CursorWebView(onCookieCaptured: { cookieHeader in
                 onSuccess(cookieHeader)

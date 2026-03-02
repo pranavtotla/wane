@@ -7,6 +7,7 @@ struct CursorUsageSummary: Equatable {
     let planUsedPercent: Double
     let billingCycleEnd: Date?
     let isUnlimited: Bool
+    let membershipType: String?
 
     var remainingPercentage: Double {
         if isUnlimited { return 100.0 }
@@ -23,32 +24,23 @@ struct CursorUsageSummary: Equatable {
         let plan = individualUsage?["plan"] as? [String: Any]
 
         // Use used/limit for accurate plan percentage (totalPercentUsed includes bonus credits)
-        let used = Self.number(from: plan?["used"]) ?? 0
-        let limit = Self.number(from: plan?["limit"]) ?? 0
+        let used = jsonNumber(from: plan?["used"]) ?? 0
+        let limit = jsonNumber(from: plan?["limit"]) ?? 0
         let planUsedPercent = limit > 0 ? min(100, (used / limit) * 100) : 0
 
         let cycleEnd: Date? = {
             guard let raw = root["billingCycleEnd"] as? String else { return nil }
-            let fractional = ISO8601DateFormatter()
-            fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-            let standard = ISO8601DateFormatter()
-            standard.formatOptions = [.withInternetDateTime]
-            return fractional.date(from: raw) ?? standard.date(from: raw)
+            return ISO8601Parsing.date(from: raw)
         }()
 
         return CursorUsageSummary(
             planUsedPercent: planUsedPercent,
             billingCycleEnd: cycleEnd,
-            isUnlimited: isUnlimited
+            isUnlimited: isUnlimited,
+            membershipType: root["membershipType"] as? String
         )
     }
 
-    private static func number(from value: Any?) -> Double? {
-        if let double = value as? Double { return double }
-        if let int = value as? Int { return Double(int) }
-        if let string = value as? String { return Double(string) }
-        return nil
-    }
 }
 
 final class CursorProvider: Provider {
@@ -86,12 +78,11 @@ final class CursorProvider: Provider {
         }
 
         let summary = try CursorUsageSummary.parse(from: data)
-        let membershipType = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])?["membershipType"] as? String
         return UsageSnapshot(
             remainingPercentage: summary.remainingPercentage,
             resetsAt: summary.billingCycleEnd,
             dailyUsage: [],
-            planName: membershipType?.capitalized,
+            planName: summary.membershipType?.capitalized,
             extraUsageSpent: nil,
             extraUsageLimit: nil
         )

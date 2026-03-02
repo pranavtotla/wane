@@ -30,6 +30,7 @@ final class CursorProviderTests: XCTestCase {
         XCTAssertEqual(summary.planUsedPercent, 30.0)
         XCTAssertEqual(summary.remainingPercentage, 70.0)
         XCTAssertNotNil(summary.billingCycleEnd)
+        XCTAssertEqual(summary.membershipType, "pro")
     }
 
     func testParseUnlimitedPlan() throws {

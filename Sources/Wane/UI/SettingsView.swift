@@ -27,7 +27,7 @@ struct SettingsView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
 
-            separator
+            Separator()
 
             // Providers
             VStack(alignment: .leading, spacing: 8) {
@@ -77,7 +77,7 @@ struct SettingsView: View {
                 }
             }
 
-            separator.padding(.top, 12)
+            Separator().padding(.top, 12)
 
             // Refresh interval
             HStack {
@@ -112,7 +112,7 @@ struct SettingsView: View {
 
             Spacer()
 
-            separator
+            Separator()
 
             HStack {
                 Text("Wane v0.1.0")
@@ -163,10 +163,5 @@ struct SettingsView: View {
         }
     }
 
-    private var separator: some View {
-        Rectangle()
-            .fill(Color.white.opacity(0.08))
-            .frame(height: 1)
-    }
 }
 #endif

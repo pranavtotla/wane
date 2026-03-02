@@ -49,5 +49,6 @@ final class CodexProviderTests: XCTestCase {
         XCTAssertEqual(usage.primaryUsedPercent, 25)
         XCTAssertEqual(usage.secondaryUsedPercent, 10)
         XCTAssertEqual(usage.remainingPercentage, 75.0)
+        XCTAssertEqual(usage.planType, "plus")
     }
 }

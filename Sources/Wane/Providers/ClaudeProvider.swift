@@ -83,11 +83,7 @@ struct ClaudeUsageResponse: Equatable {
             return nil
         }
 
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        let fallbackFormatter = ISO8601DateFormatter()
-        fallbackFormatter.formatOptions = [.withInternetDateTime]
-        guard let resetsAt = formatter.date(from: resetRaw) ?? fallbackFormatter.date(from: resetRaw) else {
+        guard let resetsAt = ISO8601Parsing.date(from: resetRaw) else {
             return nil
         }
 
@@ -167,11 +163,6 @@ final class ClaudeProvider: Provider {
         var dailyCounts: [String: Int] = [:]
         let keyFormatter = DateFormatter()
         keyFormatter.dateFormat = "yyyy-MM-dd"
-        let fractionalFormatter = ISO8601DateFormatter()
-        fractionalFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        let fallbackFormatter = ISO8601DateFormatter()
-        fallbackFormatter.formatOptions = [.withInternetDateTime]
-
         while let fileURL = enumerator.nextObject() as? URL {
             guard fileURL.pathExtension == "jsonl" else { continue }
             if let modifiedAt = try? fileURL.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate,
@@ -207,7 +198,7 @@ final class ClaudeProvider: Provider {
 
                 guard
                     let timestamp = obj["timestamp"] as? String,
-                    let date = fractionalFormatter.date(from: timestamp) ?? fallbackFormatter.date(from: timestamp)
+                    let date = ISO8601Parsing.date(from: timestamp)
                 else {
                     continue
                 }

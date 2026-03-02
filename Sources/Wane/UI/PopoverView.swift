@@ -20,7 +20,7 @@ struct PopoverView: View {
         VStack(spacing: 0) {
             ProviderTabBar(manager: manager)
 
-            separator
+            Separator()
 
             // Provider detail with content transition keyed on selected provider
             Group {
@@ -51,11 +51,11 @@ struct PopoverView: View {
             }
             .animation(.easeOut(duration: 0.15), value: manager.selectedProviderId)
 
-            separator
+            Separator()
 
             QuickLinksView(selectedConfig: manager.selectedConfig)
 
-            separator
+            Separator()
 
             FooterView(manager: manager, showSettings: $showSettings)
         }
@@ -64,10 +64,5 @@ struct PopoverView: View {
         .environment(\.colorScheme, .dark)
     }
 
-    private var separator: some View {
-        Rectangle()
-            .fill(Color.white.opacity(0.08))
-            .frame(height: 1)
-    }
 }
 #endif

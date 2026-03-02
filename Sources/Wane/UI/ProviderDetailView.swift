@@ -58,7 +58,7 @@ struct ProviderDetailView: View {
             HStack(alignment: .firstTextBaseline) {
                 Text("\(Int(snapshot.remainingPercentage))%")
                     .font(.system(size: 22, weight: .bold, design: .rounded))
-                    .foregroundColor(percentageColor)
+                    .foregroundColor(usageColor(snapshot.remainingPercentage, tint: config.tintColor))
 
                 Text("remaining")
                     .font(.system(size: 12))
@@ -79,14 +79,6 @@ struct ProviderDetailView: View {
             )
         }
         .cardStyle()
-    }
-
-    private var percentageColor: Color {
-        let pct = snapshot.remainingPercentage
-        if pct > 60 { return config.tintColor }
-        if pct > 30 { return Color(hex: 0xD4A054) }
-        if pct > 10 { return Color(hex: 0xC46B3A) }
-        return Color(hex: 0xB54444)
     }
 
     // MARK: - Extra Usage
@@ -161,9 +153,26 @@ struct ProviderDetailView: View {
     }
 }
 
+// MARK: - Shared UI Components
+
+struct Separator: View {
+    var body: some View {
+        Rectangle()
+            .fill(Color.white.opacity(0.08))
+            .frame(height: 1)
+    }
+}
+
+func usageColor(_ percentage: Double, tint: Color) -> Color {
+    if percentage > 60 { return tint }
+    if percentage > 30 { return Color(hex: 0xD4A054) }
+    if percentage > 10 { return Color(hex: 0xC46B3A) }
+    return Color(hex: 0xB54444)
+}
+
 // MARK: - Card Style
 
-extension View {
+private extension View {
     func cardStyle() -> some View {
         self
             .padding(.horizontal, 12)
@@ -189,18 +198,11 @@ struct UsageBar: View {
                     .fill(Color.white.opacity(0.08))
 
                 RoundedRectangle(cornerRadius: 3)
-                    .fill(barColor)
+                    .fill(usageColor(percentage, tint: tintColor))
                     .frame(width: max(0, geometry.size.width * CGFloat(percentage / 100)))
             }
         }
         .frame(height: 5)
-    }
-
-    private var barColor: Color {
-        if percentage > 60 { return tintColor }
-        if percentage > 30 { return Color(hex: 0xD4A054) }
-        if percentage > 10 { return Color(hex: 0xC46B3A) }
-        return Color(hex: 0xB54444)
     }
 }
 

@@ -8,13 +8,13 @@ struct FooterView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            FooterRow(icon: "gearshape", label: "Settings...") {
+            MenuRow(icon: "gearshape", label: "Settings...") {
                 showSettings = true
             }
-            FooterRow(icon: "info.circle", label: "About Wane") {
+            MenuRow(icon: "info.circle", label: "About Wane") {
                 // TODO: about panel
             }
-            FooterRow(icon: "xmark.circle", label: "Quit") {
+            MenuRow(icon: "xmark.circle", label: "Quit") {
                 NSApp.terminate(nil)
             }
         }
@@ -22,7 +22,7 @@ struct FooterView: View {
     }
 }
 
-struct FooterRow: View {
+struct MenuRow: View {
     let icon: String
     let label: String
     let action: () -> Void

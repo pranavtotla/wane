@@ -8,12 +8,12 @@ struct QuickLinksView: View {
     var body: some View {
         VStack(spacing: 0) {
             if let config = selectedConfig {
-                QuickLinkRow(
+                MenuRow(
                     icon: "chart.bar",
                     label: "Usage Dashboard",
                     action: { openDashboard(for: config) }
                 )
-                QuickLinkRow(
+                MenuRow(
                     icon: "bolt.horizontal",
                     label: "Status Page",
                     action: { openStatusPage(for: config) }
@@ -46,36 +46,4 @@ struct QuickLinksView: View {
     }
 }
 
-struct QuickLinkRow: View {
-    let icon: String
-    let label: String
-    let action: () -> Void
-
-    @State private var isHovering = false
-
-    var body: some View {
-        HStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.system(size: 12))
-                .foregroundColor(.secondary)
-                .frame(width: 16)
-
-            Text(label)
-                .font(.system(size: 13))
-                .foregroundColor(.white.opacity(0.9))
-
-            Spacer()
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 6)
-        .contentShape(Rectangle())
-        .background(isHovering ? Color.white.opacity(0.06) : Color.clear)
-        .onHover { hovering in
-            isHovering = hovering
-        }
-        .onTapGesture {
-            action()
-        }
-    }
-}
 #endif

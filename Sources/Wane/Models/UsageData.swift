@@ -39,6 +39,10 @@ struct UsageSnapshot: Equatable {
     }
 
     var last30DaysTokens: Int {
-        dailyUsage.reduce(0) { $0 + $1.tokenCount }
+        let calendar = Calendar.current
+        let thirtyDaysAgo = calendar.date(byAdding: .day, value: -30, to: calendar.startOfDay(for: Date()))!
+        return dailyUsage
+            .filter { $0.date >= thirtyDaysAgo }
+            .reduce(0) { $0 + $1.tokenCount }
     }
 }

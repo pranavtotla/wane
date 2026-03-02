@@ -35,6 +35,7 @@ struct CodexUsageResponse: Equatable {
     let secondaryUsedPercent: Double
     let secondaryResetsAt: Date?
     let creditsBalance: Double?
+    let planType: String?
 
     var remainingPercentage: Double {
         max(0, 100.0 - primaryUsedPercent)
@@ -53,20 +54,15 @@ struct CodexUsageResponse: Equatable {
         let credits = root["credits"] as? [String: Any]
 
         return CodexUsageResponse(
-            primaryUsedPercent: Self.number(from: primary?["used_percent"]) ?? 0,
-            primaryResetsAt: Self.number(from: primary?["reset_at"]).map { Date(timeIntervalSince1970: $0) },
-            secondaryUsedPercent: Self.number(from: secondary?["used_percent"]) ?? 0,
-            secondaryResetsAt: Self.number(from: secondary?["reset_at"]).map { Date(timeIntervalSince1970: $0) },
-            creditsBalance: Self.number(from: credits?["balance"])
+            primaryUsedPercent: jsonNumber(from: primary?["used_percent"]) ?? 0,
+            primaryResetsAt: jsonNumber(from: primary?["reset_at"]).map { Date(timeIntervalSince1970: $0) },
+            secondaryUsedPercent: jsonNumber(from: secondary?["used_percent"]) ?? 0,
+            secondaryResetsAt: jsonNumber(from: secondary?["reset_at"]).map { Date(timeIntervalSince1970: $0) },
+            creditsBalance: jsonNumber(from: credits?["balance"]),
+            planType: root["plan_type"] as? String
         )
     }
 
-    private static func number(from value: Any?) -> Double? {
-        if let double = value as? Double { return double }
-        if let int = value as? Int { return Double(int) }
-        if let string = value as? String { return Double(string) }
-        return nil
-    }
 }
 
 final class CodexProvider: Provider {
@@ -95,12 +91,11 @@ final class CodexProvider: Provider {
         }
 
         let usage = try CodexUsageResponse.parse(from: responseData)
-        let planType = (try? JSONSerialization.jsonObject(with: responseData) as? [String: Any])?["plan_type"] as? String
         return UsageSnapshot(
             remainingPercentage: usage.remainingPercentage,
             resetsAt: usage.primaryResetsAt,
             dailyUsage: scanLocalSessions(),
-            planName: planType?.capitalized,
+            planName: usage.planType?.capitalized,
             extraUsageSpent: nil,
             extraUsageLimit: nil
         )
@@ -122,11 +117,6 @@ final class CodexProvider: Provider {
         var dailyCounts: [String: Int] = [:]
         let keyFormatter = DateFormatter()
         keyFormatter.dateFormat = "yyyy-MM-dd"
-        let fractionalFormatter = ISO8601DateFormatter()
-        fractionalFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        let fallbackFormatter = ISO8601DateFormatter()
-        fallbackFormatter.formatOptions = [.withInternetDateTime]
-
         while let fileURL = enumerator.nextObject() as? URL {
             guard fileURL.pathExtension == "jsonl" else { continue }
             if let modifiedAt = try? fileURL.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate,
@@ -160,7 +150,7 @@ final class CodexProvider: Provider {
 
                 if sessionDate == nil,
                    let timestamp = obj["timestamp"] as? String,
-                   let date = fractionalFormatter.date(from: timestamp) ?? fallbackFormatter.date(from: timestamp) {
+                   let date = ISO8601Parsing.date(from: timestamp) {
                     sessionDate = keyFormatter.string(from: date)
                 }
             }

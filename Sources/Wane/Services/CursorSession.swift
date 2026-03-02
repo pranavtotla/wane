@@ -39,6 +39,6 @@ enum CursorSession {
     }
 
     static var hasSavedSession: Bool {
-        load() != nil
+        FileManager.default.fileExists(atPath: sessionPath)
     }
 }
